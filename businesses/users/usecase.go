@@ -3,8 +3,8 @@ package users
 import (
 	"context"
 	"peduli-covid/app/middleware"
-	"peduli-covid/businesses"
 	"peduli-covid/helpers/encrypt"
+	"peduli-covid/helpers/messages"
 	"strings"
 	"time"
 )
@@ -28,7 +28,7 @@ func (uc *userUsecase) Login(ctx context.Context, Email, password string) (strin
 	defer cancel()
 
 	if strings.TrimSpace(Email) == "" && strings.TrimSpace(password) == "" {
-		return "", businesses.ErrEmailPasswordNotFound
+		return "", messages.ErrEmailPasswordNotFound
 	}
 
 	userDomain, err := uc.userRepository.GetByEmail(ctx, Email)
@@ -37,10 +37,10 @@ func (uc *userUsecase) Login(ctx context.Context, Email, password string) (strin
 	}
 
 	if !encrypt.ValidateHash(password, userDomain.Password) {
-		return "", businesses.ErrInternalServer
+		return "", messages.ErrInternalServer
 	}
 
-	token := uc.jwtAuth.GenerateToken(userDomain.Id, userDomain.RoleID)
+	token := uc.jwtAuth.GenerateToken(userDomain.ID)
 	return token, nil
 }
 
@@ -57,12 +57,12 @@ func (uc *userUsecase) Store(ctx context.Context, userDomain *Domain) error {
 		}
 	}
 	if existedUser != (Domain{}) {
-		return businesses.ErrDuplicateData
+		return messages.ErrDuplicateData
 	}
 
 	userDomain.Password, err = encrypt.Hash(userDomain.Password)
 	if err != nil {
-		return businesses.ErrInternalServer
+		return messages.ErrInternalServer
 	}
 
 	err = uc.userRepository.Store(ctx, userDomain)

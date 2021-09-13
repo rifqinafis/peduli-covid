@@ -30,7 +30,7 @@ type Config struct {
 func GetConfig() Config {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	viper.AddConfigPath(os.Getenv("APP_PATH") + "/Alterra/PeduliCovid/app/config")
+	viper.AddConfigPath(os.Getenv("APP_PATH") + "/Alterra/peduli-covid/app/config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)

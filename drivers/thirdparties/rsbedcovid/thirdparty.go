@@ -34,7 +34,7 @@ func (rs *RSBedCovid) GetProvince(ctx context.Context) (res []rsbedcovid.Provinc
 
 	for _, value := range data.Province {
 		temp := rsbedcovid.ProvinceDomain{
-			Id:   value.Id,
+			ID:   value.ID,
 			Name: value.Name,
 		}
 		res = append(res, temp)
@@ -63,7 +63,7 @@ func (rs *RSBedCovid) GetCity(ctx context.Context, provinceID string) (res []rsb
 	}
 	for _, value := range data.City {
 		temp := rsbedcovid.CityDomain{
-			Id:   value.Id,
+			ID:   value.ID,
 			Name: value.Name,
 		}
 		res = append(res, temp)
@@ -94,7 +94,7 @@ func (rs *RSBedCovid) GetHospital(ctx context.Context, provinceID, cityID, types
 	}
 	for _, value := range data.Hospital {
 		temp := rsbedcovid.HospitalDomain{
-			Id:              value.Id,
+			ID:              value.ID,
 			Name:            value.Name,
 			Address:         value.Address,
 			Phone:           value.Phone,
@@ -159,7 +159,7 @@ func (rs *RSBedCovid) GetHospitalLocation(ctx context.Context, hospitalID string
 	}
 
 	res = rsbedcovid.HospitalLocationDomain{
-		Id:      data.Data.Id,
+		ID:      data.Data.ID,
 		Name:    data.Data.Name,
 		Address: data.Data.Address,
 		Lat:     data.Data.Lat,

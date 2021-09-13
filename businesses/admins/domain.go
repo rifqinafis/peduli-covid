@@ -6,7 +6,7 @@ import (
 )
 
 type Domain struct {
-	Id         int       `json:"id"`
+	ID         int       `json:"id"`
 	RoleID     int       `json:"role_id"`
 	HospitalID int       `json:"hospital_id"`
 	Email      string    `json:"email"`

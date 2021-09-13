@@ -1,0 +1,60 @@
+package provinces
+
+import (
+	"context"
+	"peduli-covid/businesses/provinces"
+
+	"gorm.io/gorm"
+)
+
+type PostgresRepository struct {
+	Conn *gorm.DB
+}
+
+func NewPostgresRepository(conn *gorm.DB) *PostgresRepository {
+	return &PostgresRepository{
+		Conn: conn,
+	}
+}
+
+func (nr *PostgresRepository) Fetch(ctx context.Context, page, perpage int) ([]provinces.Domain, int, error) {
+	rec := []Provinces{}
+
+	offset := (page - 1) * perpage
+	err := nr.Conn.Offset(offset).Limit(perpage).Find(&rec).Error
+	if err != nil {
+		return []provinces.Domain{}, 0, err
+	}
+
+	var totalData int64
+	err = nr.Conn.Count(&totalData).Error
+	if err != nil {
+		return []provinces.Domain{}, 0, err
+	}
+
+	var domainProvinces []provinces.Domain
+	for _, value := range rec {
+		domainProvinces = append(domainProvinces, value.toDomain())
+	}
+	return domainProvinces, int(totalData), nil
+}
+
+func (nr *PostgresRepository) GetByCode(ctx context.Context, code string) (provinces.Domain, error) {
+	rec := Provinces{}
+	err := nr.Conn.Where("code = ?", code).First(&rec).Error
+	if err != nil {
+		return provinces.Domain{}, err
+	}
+	return rec.toDomain(), nil
+}
+
+func (nr *PostgresRepository) Store(ctx context.Context, userDomain *provinces.Domain) error {
+	rec := fromDomain(*userDomain)
+
+	result := nr.Conn.Create(rec)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

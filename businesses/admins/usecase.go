@@ -3,32 +3,32 @@ package admins
 import (
 	"context"
 	"peduli-covid/app/middleware"
-	"peduli-covid/businesses"
 	"peduli-covid/helpers/encrypt"
+	"peduli-covid/helpers/messages"
 	"strings"
 	"time"
 )
 
-type adminUseCase struct {
+type adminUsecase struct {
 	adminRepository Repository
 	contextTimeout  time.Duration
 	jwtAuth         *middleware.ConfigJWT
 }
 
 func NewAdminUsecase(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
-	return &adminUseCase{
+	return &adminUsecase{
 		adminRepository: ur,
 		jwtAuth:         jwtauth,
 		contextTimeout:  timeout,
 	}
 }
 
-func (uc *adminUseCase) Login(ctx context.Context, Email, password string) (string, error) {
+func (uc *adminUsecase) Login(ctx context.Context, Email, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
 	if strings.TrimSpace(Email) == "" && strings.TrimSpace(password) == "" {
-		return "", businesses.ErrEmailPasswordNotFound
+		return "", messages.ErrEmailPasswordNotFound
 	}
 
 	adminDomain, err := uc.adminRepository.GetByEmail(ctx, Email)
@@ -37,14 +37,14 @@ func (uc *adminUseCase) Login(ctx context.Context, Email, password string) (stri
 	}
 
 	if !encrypt.ValidateHash(password, adminDomain.Password) {
-		return "", businesses.ErrInternalServer
+		return "", messages.ErrInternalServer
 	}
 
-	token := uc.jwtAuth.GenerateToken(adminDomain.Id, adminDomain.RoleID)
+	token := uc.jwtAuth.GenerateToken(adminDomain.ID)
 	return token, nil
 }
 
-func (uc *adminUseCase) Store(ctx context.Context, adminDomain *Domain) error {
+func (uc *adminUsecase) Store(ctx context.Context, adminDomain *Domain) error {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
@@ -57,12 +57,12 @@ func (uc *adminUseCase) Store(ctx context.Context, adminDomain *Domain) error {
 		}
 	}
 	if existedUser != (Domain{}) {
-		return businesses.ErrDuplicateData
+		return messages.ErrDuplicateData
 	}
 
 	adminDomain.Password, err = encrypt.Hash(adminDomain.Password)
 	if err != nil {
-		return businesses.ErrInternalServer
+		return messages.ErrInternalServer
 	}
 
 	err = uc.adminRepository.Store(ctx, adminDomain)

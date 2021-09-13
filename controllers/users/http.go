@@ -10,12 +10,12 @@ import (
 )
 
 type UserController struct {
-	userUseCase users.Usecase
+	userUsecase users.Usecase
 }
 
 func NewUserController(uc users.Usecase) *UserController {
 	return &UserController{
-		userUseCase: uc,
+		userUsecase: uc,
 	}
 }
 
@@ -27,7 +27,7 @@ func (ctrl *UserController) Store(c echo.Context) error {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	err := ctrl.userUseCase.Store(ctx, req.ToDomain())
+	err := ctrl.userUsecase.Store(ctx, req.ToDomain())
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
@@ -43,7 +43,7 @@ func (ctrl *UserController) Login(c echo.Context) error {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	token, err := ctrl.userUseCase.Login(ctx, req.Email, req.Password)
+	token, err := ctrl.userUsecase.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}

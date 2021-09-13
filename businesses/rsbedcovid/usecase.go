@@ -6,21 +6,21 @@ import (
 	"time"
 )
 
-type rsbedcovidUseCase struct {
+type rsbedcovidUsecase struct {
 	rsbedcovidRepository Repository
 	contextTimeout       time.Duration
 	jwtAuth              *middleware.ConfigJWT
 }
 
 func NewRSBedCovid(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
-	return &rsbedcovidUseCase{
+	return &rsbedcovidUsecase{
 		rsbedcovidRepository: ur,
 		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }
 
-func (uc *rsbedcovidUseCase) GetProvince(ctx context.Context) ([]ProvinceDomain, error) {
+func (uc *rsbedcovidUsecase) GetProvince(ctx context.Context) ([]ProvinceDomain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
@@ -32,7 +32,7 @@ func (uc *rsbedcovidUseCase) GetProvince(ctx context.Context) ([]ProvinceDomain,
 	return res, nil
 }
 
-func (uc *rsbedcovidUseCase) GetCity(ctx context.Context, provinceID string) ([]CityDomain, error) {
+func (uc *rsbedcovidUsecase) GetCity(ctx context.Context, provinceID string) ([]CityDomain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
@@ -44,7 +44,7 @@ func (uc *rsbedcovidUseCase) GetCity(ctx context.Context, provinceID string) ([]
 	return res, nil
 }
 
-func (uc *rsbedcovidUseCase) GetHospital(ctx context.Context, provinceID, cityID, types string) ([]HospitalDomain, error) {
+func (uc *rsbedcovidUsecase) GetHospital(ctx context.Context, provinceID, cityID, types string) ([]HospitalDomain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
@@ -56,7 +56,7 @@ func (uc *rsbedcovidUseCase) GetHospital(ctx context.Context, provinceID, cityID
 	return res, nil
 }
 
-func (uc *rsbedcovidUseCase) GetBedDetail(ctx context.Context, hospitalID, types string) ([]BedDetailDomain, error) {
+func (uc *rsbedcovidUsecase) GetBedDetail(ctx context.Context, hospitalID, types string) ([]BedDetailDomain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
@@ -68,7 +68,7 @@ func (uc *rsbedcovidUseCase) GetBedDetail(ctx context.Context, hospitalID, types
 	return res, nil
 }
 
-func (uc *rsbedcovidUseCase) GetHospitalLocation(ctx context.Context, hospitalID string) (HospitalLocationDomain, error) {
+func (uc *rsbedcovidUsecase) GetHospitalLocation(ctx context.Context, hospitalID string) (HospitalLocationDomain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 

@@ -1,0 +1,602 @@
+---
+openapi: 3.0.0
+info:
+  title: Peduli Covid API
+  description: This is a simple API
+  contact:
+    email: you@your-company.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0-oas3
+servers:
+- url: https://virtserver.swaggerhub.com/rifqinafis/PeduliCovid/1.0.0
+tags:
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /province:
+    get:
+      tags:
+      - developers
+      summary: Get All Province Data
+      description: |
+        By passing in the appropriate options, you can search for province data
+      operationID: getAllProvince
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Province'
+        "400":
+          description: bad input parameter
+  /city:
+    get:
+      tags:
+      - developers
+      summary: Get All City Data By Province
+      description: |
+        By passing in the appropriate options, you can search for city data
+      operationID: getAllCity
+      parameters:
+      - name: provinceID
+        in: query
+        description: enter province id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+        "400":
+          description: bad input parameter
+  /hospital:
+    get:
+      tags:
+      - developers
+      summary: Get All Hospital Data By City
+      description: |
+        By passing in the appropriate options, you can search for hospital data
+      operationID: getAllHospital
+      parameters:
+      - name: cityID
+        in: query
+        description: enter city id
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: type
+        in: query
+        description: type=1 for covid, type=2 for non-covid
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hospital'
+        "400":
+          description: bad input parameter
+  /bed-type/{id}:
+    get:
+      tags:
+      - developers
+      summary: Get Bed Type By Hospital ID
+      description: |
+        By passing in the appropriate options, you can search for bed type data
+      operationID: getBedType
+      parameters:
+      - name: id
+        in: path
+        description: enter hospital id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: type
+        in: query
+        description: type=1 for covid, type=2 for non-covid
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BedType'
+        "400":
+          description: bad input parameter
+  /hospital-map/{id}:
+    get:
+      tags:
+      - developers
+      summary: Get Detail Hospital Map Data By ID
+      description: |
+        By passing in the appropriate options, you can search for hospital data
+      operationID: getDetailHospitalMap
+      parameters:
+      - name: id
+        in: path
+        description: enter hospital id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HospitalMap'
+        "400":
+          description: bad input parameter
+  /reservation:
+    post:
+      tags:
+      - developers
+      summary: Post Reservation
+      description: |
+        By passing in the appropriate options, you can reservation a bed
+      operationID: postReservation
+      requestBody:
+        description: User to reservation bed
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/reservation_body'
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+        "400":
+          description: bad input parameter
+  /payment/{id}:
+    post:
+      tags:
+      - developers
+      summary: Post Payment
+      description: |
+        By passing in the appropriate options, you can pay your reservation
+      operationID: postPayment
+      parameters:
+      - name: id
+        in: path
+        description: enter payment id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        description: User to pay reservation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/payment_id_body'
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+        "400":
+          description: bad input parameter
+components:
+  schemas:
+    Province:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - code
+          - createdAt
+          - id
+          - name
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/Province_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    City:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - code
+          - createdAt
+          - id
+          - name
+          - provinceID
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/City_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    Hospital:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - address
+          - bedAvailable
+          - cityID
+          - createdAt
+          - id
+          - name
+          - phone
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/Hospital_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    BedType:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - bedAvailable
+          - bedEmpty
+          - createdAt
+          - hospitalID
+          - id
+          - name
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/BedType_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    HospitalMap:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - address
+          - createdAt
+          - id
+          - link
+          - name
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/HospitalMap_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    Reservation:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - amount
+          - createdAt
+          - id
+          - paymentID
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    Payment:
+      required:
+      - data
+      - meta
+      - msg
+      - stat
+      type: object
+      properties:
+        data:
+          required:
+          - amount
+          - createdAt
+          - date
+          - id
+          - paymentMethodID
+          - reservationID
+          - updatedAt
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment_data'
+        meta:
+          type: string
+        stat:
+          type: integer
+          example: 200
+        msg:
+          type: string
+          example: success
+    reservation_body:
+      required:
+      - bedTypeID
+      - hospitalID
+      type: object
+      properties:
+        hospitalID:
+          type: integer
+        bedTypeID:
+          type: integer
+    payment_id_body:
+      required:
+      - amount
+      - paymentMethodID
+      type: object
+      properties:
+        paymentMethodID:
+          type: integer
+        amount:
+          type: number
+    Province_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        code:
+          type: string
+          example: 1prop
+        name:
+          type: string
+          example: Jawa Timur
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    City_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        provinceID:
+          type: integer
+          format: serial
+          example: 1
+        code:
+          type: string
+          example: SBY
+        name:
+          type: string
+          example: Surabaya
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Hospital_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        cityID:
+          type: integer
+          format: serial
+          example: 1
+        name:
+          type: string
+          example: RS dr. Ramelan
+        phone:
+          type: string
+          example: "318404062"
+        address:
+          type: string
+          example: Jl. Gadung No. 1 Surabaya
+        bedAvailable:
+          type: integer
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    BedType_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        hospitalID:
+          type: integer
+          format: serial
+          example: 1
+        name:
+          type: string
+          example: IGD Khusus Covid
+        bedEmpty:
+          type: integer
+          example: 10
+        bedAvailable:
+          type: integer
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    HospitalMap_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        name:
+          type: string
+          example: RS dr. Ramelan
+        address:
+          type: string
+          example: Jl. Gadung No. 1 Surabaya
+        link:
+          type: string
+          example: https://www.google.com/maps/search/?api=1&query=-7.3083,112.738
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Reservation_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        paymentID:
+          type: string
+          format: serial
+          example: "1"
+        amount:
+          type: number
+          example: 300123
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Payment_data:
+      type: object
+      properties:
+        id:
+          type: string
+          format: serial
+          example: "1"
+        paymentMethodID:
+          type: string
+          format: serial
+          example: "1"
+        reservationID:
+          type: string
+          format: serial
+          example: "1"
+        amount:
+          type: number
+          example: 300123
+        date:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time

@@ -10,12 +10,12 @@ import (
 )
 
 type AdminController struct {
-	adminUseCase admins.Usecase
+	adminUsecase admins.Usecase
 }
 
 func NewAdminController(uc admins.Usecase) *AdminController {
 	return &AdminController{
-		adminUseCase: uc,
+		adminUsecase: uc,
 	}
 }
 
@@ -27,7 +27,7 @@ func (ctrl *AdminController) Store(c echo.Context) error {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	err := ctrl.adminUseCase.Store(ctx, req.ToDomain())
+	err := ctrl.adminUsecase.Store(ctx, req.ToDomain())
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
@@ -43,7 +43,7 @@ func (ctrl *AdminController) Login(c echo.Context) error {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	token, err := ctrl.adminUseCase.Login(ctx, req.Email, req.Password)
+	token, err := ctrl.adminUsecase.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}

@@ -1,19 +1,31 @@
 package main
 
 import (
-	_dbFactory "peduli-covid/drivers/databases"
+	_dbFactory "peduli-covid/drivers"
 
 	_userUsecase "peduli-covid/businesses/users"
 	_userController "peduli-covid/controllers/users"
-	_userRepo "peduli-covid/drivers/databases/users"
+	_userRepo "peduli-covid/drivers/postgres/users"
 
 	_adminUsecase "peduli-covid/businesses/admins"
 	_adminController "peduli-covid/controllers/admins"
-	_adminRepo "peduli-covid/drivers/databases/admins"
+	_adminRepo "peduli-covid/drivers/postgres/admins"
 
 	_rsbedcovidUsecase "peduli-covid/businesses/rsbedcovid"
 	_rsbedcovidController "peduli-covid/controllers/rsbedcovid"
 	_rsbedcovidRepo "peduli-covid/drivers/thirdparties/rsbedcovid"
+
+	_provinceUsecase "peduli-covid/businesses/provinces"
+	_provinceController "peduli-covid/controllers/provinces"
+	_provinceRepo "peduli-covid/drivers/postgres/provinces"
+
+	_roleUsecase "peduli-covid/businesses/roles"
+	_roleController "peduli-covid/controllers/roles"
+	_roleRepo "peduli-covid/drivers/postgres/roles"
+
+	_cityUsecase "peduli-covid/businesses/cities"
+	_cityController "peduli-covid/controllers/cities"
+	_cityRepo "peduli-covid/drivers/postgres/cities"
 
 	_dbDriver "peduli-covid/drivers/postgres"
 
@@ -33,6 +45,9 @@ func dbMigrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&_userRepo.Users{},
 		&_adminRepo.Admins{},
+		&_provinceRepo.Provinces{},
+		&_roleRepo.Roles{},
+		&_cityRepo.Cities{},
 	)
 }
 
@@ -69,11 +84,26 @@ func main() {
 	rsbedcovidUsecase := _rsbedcovidUsecase.NewRSBedCovid(rsbedcovidRepo, &configJWT, timeoutContext)
 	rsbedcovidCtrl := _rsbedcovidController.NewRSBedCovidController(rsbedcovidUsecase)
 
+	provinceRepo := _dbFactory.NewProvinceRepository(db)
+	provinceUsecase := _provinceUsecase.NewProvinceUsecase(provinceRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	provinceCtrl := _provinceController.NewProvinceController(provinceUsecase)
+
+	roleRepo := _dbFactory.NewRoleRepository(db)
+	roleUsecase := _roleUsecase.NewRoleUsecase(roleRepo, &configJWT, timeoutContext)
+	roleCtrl := _roleController.NewRoleController(roleUsecase)
+
+	cityRepo := _dbFactory.NewCityRepository(db)
+	cityUsecase := _cityUsecase.NewCityUsecase(cityRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	cityCtrl := _cityController.NewCityController(cityUsecase)
+
 	routesInit := _routes.ControllerList{
-		JWTMiddleware:        &configJWT,
+		JWTMiddleware:        configJWT.Init(),
 		AdminController:      *adminCtrl,
 		UserController:       *userCtrl,
 		RSBedCovidController: *rsbedcovidCtrl,
+		ProvinceController:   *provinceCtrl,
+		RoleController:       *roleCtrl,
+		CityController:       *cityCtrl,
 	}
 	routesInit.RouteRegister(e)
 

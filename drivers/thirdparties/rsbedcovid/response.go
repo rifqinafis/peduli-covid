@@ -5,7 +5,7 @@ type ProvinceRespon struct {
 }
 
 type Province struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -14,7 +14,7 @@ type CityRespon struct {
 }
 
 type City struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -24,7 +24,7 @@ type HospitalRespon struct {
 }
 
 type Hospital struct {
-	Id              string `json:"id"`
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	Address         string `json:"address"`
 	Phone           string `json:"phone"`
@@ -39,7 +39,7 @@ type BedDetailRespon struct {
 }
 
 type BedDetail struct {
-	Id        string       `json:"id"`
+	ID        string       `json:"id"`
 	Name      string       `json:"name"`
 	Address   string       `json:"address"`
 	Phone     string       `json:"phone"`
@@ -64,7 +64,7 @@ type HospitalLocationRespon struct {
 }
 
 type HospitalLocation struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Address string `json:"address"`
 	Lat     string `json:"lat"`

@@ -3,17 +3,17 @@ package rsbedcovid
 import "context"
 
 type ProvinceDomain struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 type CityDomain struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 type HospitalDomain struct {
-	Id              string `json:"id"`
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	Address         string `json:"address"`
 	Phone           string `json:"phone"`
@@ -30,7 +30,7 @@ type BedDetailDomain struct {
 }
 
 type HospitalLocationDomain struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Address string `json:"address"`
 	Lat     string `json:"lat"`
