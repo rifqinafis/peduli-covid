@@ -17,26 +17,34 @@ func NewPostgresRepository(conn *gorm.DB) *PostgresRepository {
 	}
 }
 
-func (nr *PostgresRepository) Fetch(ctx context.Context, page, perpage int) ([]cities.Domain, int, error) {
+func (nr *PostgresRepository) FindAll(ctx context.Context) ([]cities.Domain, error) {
 	rec := []Cities{}
 
-	offset := (page - 1) * perpage
-	err := nr.Conn.Offset(offset).Limit(perpage).Find(&rec).Error
+	err := nr.Conn.Find(&rec).Error
 	if err != nil {
-		return []cities.Domain{}, 0, err
-	}
-
-	var totalData int64
-	err = nr.Conn.Count(&totalData).Error
-	if err != nil {
-		return []cities.Domain{}, 0, err
+		return []cities.Domain{}, err
 	}
 
 	var domainCities []cities.Domain
 	for _, value := range rec {
 		domainCities = append(domainCities, value.toDomain())
 	}
-	return domainCities, int(totalData), nil
+	return domainCities, nil
+}
+
+func (nr *PostgresRepository) FindByProvinceCode(ctx context.Context, provinceCode string) ([]cities.Domain, error) {
+	rec := []Cities{}
+
+	err := nr.Conn.Where("province_code = ?", provinceCode).Find(&rec).Error
+	if err != nil {
+		return []cities.Domain{}, err
+	}
+
+	var domainCities []cities.Domain
+	for _, value := range rec {
+		domainCities = append(domainCities, value.toDomain())
+	}
+	return domainCities, nil
 }
 
 func (nr *PostgresRepository) GetByID(ctx context.Context, id int) (cities.Domain, error) {

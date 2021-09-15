@@ -17,26 +17,19 @@ func NewPostgresRepository(conn *gorm.DB) *PostgresRepository {
 	}
 }
 
-func (nr *PostgresRepository) Fetch(ctx context.Context, page, perpage int) ([]provinces.Domain, int, error) {
+func (nr *PostgresRepository) FindAll(ctx context.Context) ([]provinces.Domain, error) {
 	rec := []Provinces{}
 
-	offset := (page - 1) * perpage
-	err := nr.Conn.Offset(offset).Limit(perpage).Find(&rec).Error
+	err := nr.Conn.Find(&rec).Error
 	if err != nil {
-		return []provinces.Domain{}, 0, err
-	}
-
-	var totalData int64
-	err = nr.Conn.Count(&totalData).Error
-	if err != nil {
-		return []provinces.Domain{}, 0, err
+		return []provinces.Domain{}, err
 	}
 
 	var domainProvinces []provinces.Domain
 	for _, value := range rec {
 		domainProvinces = append(domainProvinces, value.toDomain())
 	}
-	return domainProvinces, int(totalData), nil
+	return domainProvinces, nil
 }
 
 func (nr *PostgresRepository) GetByCode(ctx context.Context, code string) (provinces.Domain, error) {

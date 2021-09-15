@@ -2,59 +2,58 @@ package cities
 
 import (
 	"context"
-	"fmt"
 	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/rsbedcovid"
 	"peduli-covid/helpers/messages"
 	"strconv"
-	"strings"
 	"time"
 )
 
-type CityUsecase struct {
-	CityRepository       Repository
+type cityUsecase struct {
+	cityRepository       Repository
 	rsbedcovidRepository rsbedcovid.Repository
 	contextTimeout       time.Duration
 	jwtAuth              *middleware.ConfigJWT
 }
 
 func NewCityUsecase(ur Repository, rsRepo rsbedcovid.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
-	return &CityUsecase{
-		CityRepository:       ur,
+	return &cityUsecase{
+		cityRepository:       ur,
 		rsbedcovidRepository: rsRepo,
 		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }
 
-func (uc *CityUsecase) Store(ctx context.Context, CityDomain *Domain) error {
+func (uc *cityUsecase) FindAll(ctx context.Context) ([]Domain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
-	existedUser, err := uc.CityRepository.GetByID(ctx, CityDomain.ID)
+	res, err := uc.cityRepository.FindAll(ctx)
 	if err != nil {
-		if !strings.Contains(err.Error(), "not found") {
-			return err
-		}
-	}
-	if existedUser != (Domain{}) {
-		return messages.ErrDuplicateData
+		return res, err
 	}
 
-	err = uc.CityRepository.Store(ctx, CityDomain)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return res, nil
 }
 
-func (uc *CityUsecase) StoreFromAPI(ctx context.Context) error {
+func (uc *cityUsecase) FindByProvinceCode(ctx context.Context, provinceCode string) ([]Domain, error) {
+	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
+	defer cancel()
+
+	res, err := uc.cityRepository.FindByProvinceCode(ctx, provinceCode)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
+}
+
+func (uc *cityUsecase) StoreFromAPI(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
 	provinceData, err := uc.rsbedcovidRepository.GetProvince(ctx)
-	fmt.Println(provinceData)
 	if err != nil {
 		return messages.ErrNotFound
 	}
@@ -67,7 +66,7 @@ func (uc *CityUsecase) StoreFromAPI(ctx context.Context) error {
 
 		for _, data := range CityData {
 			id, _ := strconv.Atoi(data.ID)
-			existedUser, _ := uc.CityRepository.GetByID(ctx, id)
+			existedUser, _ := uc.cityRepository.GetByID(ctx, id)
 			if existedUser != (Domain{}) {
 				continue
 			} else {
@@ -77,7 +76,7 @@ func (uc *CityUsecase) StoreFromAPI(ctx context.Context) error {
 					Code:         data.Name,
 					Name:         data.Name,
 				}
-				err = uc.CityRepository.Store(ctx, City)
+				err = uc.cityRepository.Store(ctx, City)
 				if err != nil {
 					return err
 				}

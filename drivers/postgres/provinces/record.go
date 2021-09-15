@@ -3,6 +3,8 @@ package provinces
 import (
 	"peduli-covid/businesses/provinces"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Provinces struct {
@@ -11,6 +13,7 @@ type Provinces struct {
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 func (rec *Provinces) toDomain() provinces.Domain {
@@ -20,6 +23,7 @@ func (rec *Provinces) toDomain() provinces.Domain {
 		Name:      rec.Name,
 		CreatedAt: rec.CreatedAt,
 		UpdatedAt: rec.UpdatedAt,
+		DeletedAt: rec.DeletedAt,
 	}
 }
 
@@ -30,5 +34,6 @@ func fromDomain(provinceDomain provinces.Domain) *Provinces {
 		Name:      provinceDomain.Name,
 		CreatedAt: provinceDomain.CreatedAt,
 		UpdatedAt: provinceDomain.UpdatedAt,
+		DeletedAt: provinceDomain.DeletedAt,
 	}
 }

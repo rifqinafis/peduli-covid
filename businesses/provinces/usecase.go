@@ -5,7 +5,6 @@ import (
 	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/rsbedcovid"
 	"peduli-covid/helpers/messages"
-	"strings"
 	"time"
 )
 
@@ -25,26 +24,16 @@ func NewProvinceUsecase(ur Repository, rsRepo rsbedcovid.Repository, jwtauth *mi
 	}
 }
 
-func (uc *provinceUsecase) Store(ctx context.Context, provinceDomain *Domain) error {
+func (uc *provinceUsecase) FindAll(ctx context.Context) ([]Domain, error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
-	existedUser, err := uc.provinceRepository.GetByCode(ctx, provinceDomain.Code)
+	res, err := uc.provinceRepository.FindAll(ctx)
 	if err != nil {
-		if !strings.Contains(err.Error(), "not found") {
-			return err
-		}
-	}
-	if existedUser != (Domain{}) {
-		return messages.ErrDuplicateData
+		return res, err
 	}
 
-	err = uc.provinceRepository.Store(ctx, provinceDomain)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return res, nil
 }
 
 func (uc *provinceUsecase) StoreFromAPI(ctx context.Context) error {

@@ -3,6 +3,8 @@ package roles
 import (
 	"peduli-covid/businesses/roles"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Roles struct {
@@ -11,6 +13,7 @@ type Roles struct {
 	Code      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 func (rec *Roles) toDomain() roles.Domain {
@@ -20,6 +23,7 @@ func (rec *Roles) toDomain() roles.Domain {
 		Code:      rec.Code,
 		CreatedAt: rec.CreatedAt,
 		UpdatedAt: rec.UpdatedAt,
+		DeletedAt: rec.DeletedAt,
 	}
 }
 
@@ -30,5 +34,6 @@ func fromDomain(roleDomain roles.Domain) *Roles {
 		Code:      roleDomain.Code,
 		CreatedAt: roleDomain.CreatedAt,
 		UpdatedAt: roleDomain.UpdatedAt,
+		DeletedAt: roleDomain.DeletedAt,
 	}
 }

@@ -3,6 +3,8 @@ package cities
 import (
 	"peduli-covid/businesses/cities"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Cities struct {
@@ -12,6 +14,7 @@ type Cities struct {
 	Name         string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt
 }
 
 func (rec *Cities) toDomain() cities.Domain {
@@ -22,6 +25,7 @@ func (rec *Cities) toDomain() cities.Domain {
 		Name:         rec.Name,
 		CreatedAt:    rec.CreatedAt,
 		UpdatedAt:    rec.UpdatedAt,
+		DeletedAt:    rec.DeletedAt,
 	}
 }
 
@@ -33,5 +37,6 @@ func fromDomain(cityDomain cities.Domain) *Cities {
 		Name:         cityDomain.Name,
 		CreatedAt:    cityDomain.CreatedAt,
 		UpdatedAt:    cityDomain.UpdatedAt,
+		DeletedAt:    cityDomain.DeletedAt,
 	}
 }

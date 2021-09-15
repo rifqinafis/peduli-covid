@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"peduli-covid/app/middleware"
+	"peduli-covid/businesses/roles"
 	"peduli-covid/helpers/encrypt"
 	"peduli-covid/helpers/messages"
 	"strings"
@@ -11,13 +12,15 @@ import (
 
 type userUsecase struct {
 	userRepository Repository
+	roleRepository roles.Repository
 	contextTimeout time.Duration
 	jwtAuth        *middleware.ConfigJWT
 }
 
-func NewUserUsecase(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewUserUsecase(ur Repository, roleRepo roles.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
 	return &userUsecase{
 		userRepository: ur,
+		roleRepository: roleRepo,
 		jwtAuth:        jwtauth,
 		contextTimeout: timeout,
 	}
@@ -71,4 +74,18 @@ func (uc *userUsecase) Store(ctx context.Context, userDomain *Domain) error {
 	}
 
 	return nil
+}
+
+func (uc *userUsecase) GetByID(ctx context.Context, id int) (roles.Domain, error) {
+	userData, err := uc.userRepository.GetByID(ctx, id)
+	if err != nil {
+		return roles.Domain{}, err
+	}
+
+	res, err := uc.roleRepository.GetByID(userData.RoleID)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
 }

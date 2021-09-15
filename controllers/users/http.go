@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"net/http"
 	"peduli-covid/businesses/users"
 	controller "peduli-covid/controllers"
@@ -53,4 +54,13 @@ func (ctrl *UserController) Login(c echo.Context) error {
 	}{Token: token}
 
 	return controller.NewSuccessResponse(c, response)
+}
+
+func (ctrl *UserController) UserRole(id int) string {
+	role := ""
+	user, err := ctrl.userUsecase.GetByID(context.Background(), id)
+	if err == nil {
+		role = user.Code
+	}
+	return role
 }

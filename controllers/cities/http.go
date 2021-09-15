@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"peduli-covid/businesses/cities"
 	controller "peduli-covid/controllers"
-	"peduli-covid/controllers/cities/request"
 
 	echo "github.com/labstack/echo/v4"
 )
@@ -30,18 +29,15 @@ func (ctrl *CityController) StoreFromAPI(c echo.Context) error {
 	return controller.NewSuccessResponse(c, "Successfully inserted")
 }
 
-func (ctrl *CityController) Store(c echo.Context) error {
+func (ctrl *CityController) FindByProvinceCode(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	req := request.Cities{}
-	if err := c.Bind(&req); err != nil {
-		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
-	}
+	provinceCode := c.QueryParam("province_code")
 
-	err := ctrl.cityUsecase.Store(ctx, req.ToDomain())
+	resp, err := ctrl.cityUsecase.FindByProvinceCode(ctx, provinceCode)
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	return controller.NewSuccessResponse(c, "Successfully inserted")
+	return controller.NewSuccessResponse(c, resp)
 }

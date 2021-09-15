@@ -33,7 +33,7 @@ CREATE TRIGGER users BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE updat
 insert into users(id, role_id, email, password, phone, deleted_at) values(0, 0, '', '', '', current_timestamp);
 
 
-create table payment_methods(
+create table paymentmethods(
 	id SERIAL not null primary key,
 	code text not null default '',
 	name text not null default '',
@@ -41,8 +41,8 @@ create table payment_methods(
 	updated_at timestamp not null default current_timestamp,
 	deleted_at timestamp
 );
-CREATE TRIGGER payment_methods BEFORE UPDATE ON payment_methods FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
-insert into payment_methods(id, name, code, deleted_at) values(0, '', '', current_timestamp);
+CREATE TRIGGER paymentmethods BEFORE UPDATE ON paymentmethods FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
+insert into paymentmethods(id, name, code, deleted_at) values(0, '', '', current_timestamp);
 
 
 create table provinces(
@@ -82,8 +82,9 @@ create table hospitals(
 CREATE TRIGGER hospitals BEFORE UPDATE ON hospitals FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
 insert into hospitals(id, city_id, name, address, phone, total_bed_available, deleted_at) values(0, 0, '', '', '', 0, current_timestamp);
 
-create table bed_types(
+create table bedtypes(
 	id SERIAL not null primary key,
+	hospital_id int not null references hospitals(id) default 0,
 	name text not null default '',
 	bed_available int not null default 0,
 	bed_empty int not null default 0,
@@ -91,14 +92,14 @@ create table bed_types(
 	updated_at timestamp not null default current_timestamp,
 	deleted_at timestamp
 );
-CREATE TRIGGER bed_types BEFORE UPDATE ON bed_types FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
-insert into bed_types(id, name, bed_available, bed_empty, deleted_at) values(0, '', 0, 0, current_timestamp);
+CREATE TRIGGER bedtypes BEFORE UPDATE ON bedtypes FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
+insert into bedtypes(id, name, bed_available, bed_empty, deleted_at) values(0, '', 0, 0, current_timestamp);
 
 create table reservations(
 	id SERIAL not null primary key,
 	user_id int not null references users(id) default 0,
 	hospital_id int not null references hospitals(id) default 0,
-	bed_type_id int not null references bed_types(id) default 0,
+	bedtype_id int not null references bedtypes(id) default 0,
 	status text not null default '',
 	created_at timestamp not null default current_timestamp,
 	updated_at timestamp not null default current_timestamp,
@@ -109,7 +110,7 @@ insert into reservations(id, user_id, hospital_id, bed_type_id, deleted_at) valu
 
 create table payments(
 	id SERIAL not null primary key,
-	payment_method_id int not null references payment_methods(id) default 0,
+	paymentmethod_id int not null references paymentmethods(id) default 0,
 	reservation_id int not null references reservations(id) default 0,
 	amount numeric(20,3) not null default 0,
 	date date not null default now(),
@@ -118,7 +119,7 @@ create table payments(
 	deleted_at timestamp
 );
 CREATE TRIGGER payments BEFORE UPDATE ON payments FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
-insert into payments(id, payment_method_id, reservation_id, amount, date, deleted_at) values(0, 0, 0, 0, now(), current_timestamp);
+insert into payments(id, paymentmethod_id, reservation_id, amount, date, deleted_at) values(0, 0, 0, 0, now(), current_timestamp);
 
 create table invoices(
 	id SERIAL not null primary key,
@@ -162,3 +163,6 @@ insert into notifications(id, user_id, admin_id, code, details, deleted_at) valu
 ALTER TABLE provinces ADD UNIQUE (code);
 ALTER TABLE cities ADD COLUMN province_code VARCHAR(8) NOT NULL DEFAULT '';
 ALTER TABLE cities ADD CONSTRAINT fk_province_code FOREIGN KEY (province_code) REFERENCES provinces(code);
+alter table bed_types add column hospital_id int not null references hospitals(id) default 0;
+ALTER TABLE users ADD COLUMN hospital_id int NOT NULL DEFAULT 0;
+ALTER TABLE users ADD CONSTRAINT fk_hospital_id FOREIGN KEY (hospital_id) REFERENCES hospitals(id);

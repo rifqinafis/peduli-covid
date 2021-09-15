@@ -1,8 +1,6 @@
 package roles
 
-import (
-	"peduli-covid/businesses/roles"
-)
+import "peduli-covid/businesses/roles"
 
 type RoleController struct {
 	roleUsecase roles.Usecase

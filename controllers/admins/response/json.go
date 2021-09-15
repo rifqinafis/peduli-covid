@@ -1,7 +1,7 @@
 package response
 
 import (
-	"peduli-covid/businesses/admins"
+	"peduli-covid/businesses/users"
 	"time"
 )
 
@@ -16,7 +16,7 @@ type Admins struct {
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
-func FromDomain(domain admins.Domain) Admins {
+func FromDomain(domain users.Domain) Admins {
 	return Admins{
 		ID:         domain.ID,
 		RoleID:     domain.RoleID,
