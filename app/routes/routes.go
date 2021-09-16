@@ -10,6 +10,7 @@ import (
 	"peduli-covid/controllers/cities"
 	"peduli-covid/controllers/hospitals"
 	"peduli-covid/controllers/invoices"
+	"peduli-covid/controllers/notifications"
 	"peduli-covid/controllers/payments"
 	"peduli-covid/controllers/provinces"
 	"peduli-covid/controllers/reservations"
@@ -23,18 +24,19 @@ import (
 )
 
 type ControllerList struct {
-	JWTMiddleware         midware.JWTConfig
-	AdminController       admins.AdminController
-	UserController        users.UserController
-	RSBedCovidController  rsbedcovids.RSBedCovidController
-	ProvinceController    provinces.ProvinceController
-	RoleController        roles.RoleController
-	CityController        cities.CityController
-	HospitalController    hospitals.HospitalController
-	BedtypeController     bedtypes.BedtypeController
-	ReservationController reservations.ReservationController
-	InvoiceController     invoices.InvoiceController
-	PaymentController     payments.PaymentController
+	JWTMiddleware          midware.JWTConfig
+	AdminController        admins.AdminController
+	UserController         users.UserController
+	RSBedCovidController   rsbedcovids.RSBedCovidController
+	ProvinceController     provinces.ProvinceController
+	RoleController         roles.RoleController
+	CityController         cities.CityController
+	HospitalController     hospitals.HospitalController
+	BedtypeController      bedtypes.BedtypeController
+	ReservationController  reservations.ReservationController
+	InvoiceController      invoices.InvoiceController
+	PaymentController      payments.PaymentController
+	NotificationController notifications.NotificationController
 }
 
 func (cl *ControllerList) RouteRegister(e *echo.Echo) {
@@ -84,6 +86,9 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	payment := e.Group("/payment", midware.JWTWithConfig(cl.JWTMiddleware))
 	payment.POST("/", cl.PaymentController.Store, RoleValidation(consts.USER_ROLE, cl.UserController))
 	payment.GET("/user", cl.PaymentController.FindByUserID, RoleValidation(consts.USER_ROLE, cl.UserController))
+
+	notification := e.Group("/notification", midware.JWTWithConfig(cl.JWTMiddleware))
+	notification.GET("/user", cl.NotificationController.FindByUserID)
 }
 
 func RoleValidation(role string, userControler users.UserController) echo.MiddlewareFunc {

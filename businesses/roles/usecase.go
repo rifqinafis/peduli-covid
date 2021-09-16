@@ -1,20 +1,17 @@
 package roles
 
 import (
-	"peduli-covid/app/middleware"
 	"time"
 )
 
 type roleUsecase struct {
 	roleRepository Repository
 	contextTimeout time.Duration
-	jwtAuth        *middleware.ConfigJWT
 }
 
-func NewRoleUsecase(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewRoleUsecase(ur Repository, timeout time.Duration) Usecase {
 	return &roleUsecase{
 		roleRepository: ur,
-		jwtAuth:        jwtauth,
 		contextTimeout: timeout,
 	}
 }

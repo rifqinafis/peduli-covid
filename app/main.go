@@ -46,6 +46,10 @@ import (
 	_paymentController "peduli-covid/controllers/payments"
 	_paymentRepo "peduli-covid/drivers/postgres/payments"
 
+	_notificationUsecase "peduli-covid/businesses/notifications"
+	_notificationController "peduli-covid/controllers/notifications"
+	_notificationRepo "peduli-covid/drivers/postgres/notifications"
+
 	_dbDriver "peduli-covid/drivers/postgres"
 
 	_config "peduli-covid/app/config"
@@ -71,6 +75,7 @@ func dbMigrate(db *gorm.DB) {
 		&_reservationRepo.Reservations{},
 		&_invoiceRepo.Invoices{},
 		&_paymentRepo.Payments{},
+		&_notificationRepo.Notifications{},
 	)
 }
 
@@ -96,7 +101,7 @@ func main() {
 	e := echo.New()
 
 	roleRepo := _dbFactory.NewRoleRepository(db)
-	roleUsecase := _roleUsecase.NewRoleUsecase(roleRepo, &configJWT, timeoutContext)
+	roleUsecase := _roleUsecase.NewRoleUsecase(roleRepo, timeoutContext)
 	roleCtrl := _roleController.NewRoleController(roleUsecase)
 
 	userRepo := _dbFactory.NewUserRepository(db)
@@ -112,46 +117,51 @@ func main() {
 	rsbedcovidCtrl := _rsbedcovidController.NewRSBedCovidController(rsbedcovidUsecase)
 
 	provinceRepo := _dbFactory.NewProvinceRepository(db)
-	provinceUsecase := _provinceUsecase.NewProvinceUsecase(provinceRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	provinceUsecase := _provinceUsecase.NewProvinceUsecase(provinceRepo, rsbedcovidRepo, timeoutContext)
 	provinceCtrl := _provinceController.NewProvinceController(provinceUsecase)
 
 	cityRepo := _dbFactory.NewCityRepository(db)
-	cityUsecase := _cityUsecase.NewCityUsecase(cityRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	cityUsecase := _cityUsecase.NewCityUsecase(cityRepo, rsbedcovidRepo, timeoutContext)
 	cityCtrl := _cityController.NewCityController(cityUsecase)
 
 	hospitalRepo := _dbFactory.NewHospitalRepository(db)
-	hospitalUsecase := _hospitalUsecase.NewHospitalUsecase(hospitalRepo, cityRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	hospitalUsecase := _hospitalUsecase.NewHospitalUsecase(hospitalRepo, cityRepo, rsbedcovidRepo, timeoutContext)
 	hospitalCtrl := _hospitalController.NewHospitalController(hospitalUsecase)
 
 	bedtypeRepo := _dbFactory.NewBedtypeRepository(db)
-	bedtypeUsecase := _bedtypeUsecase.NewBedtypeUsecase(bedtypeRepo, hospitalRepo, rsbedcovidRepo, &configJWT, timeoutContext)
+	bedtypeUsecase := _bedtypeUsecase.NewBedtypeUsecase(bedtypeRepo, hospitalRepo, rsbedcovidRepo, timeoutContext)
 	bedtypeCtrl := _bedtypeController.NewBedtypeController(bedtypeUsecase)
 
 	invoiceRepo := _dbFactory.NewInvoiceRepository(db)
-	invoiceUsecase := _invoiceUsecase.NewInvoiceUsecase(invoiceRepo, &configJWT, timeoutContext)
+	invoiceUsecase := _invoiceUsecase.NewInvoiceUsecase(invoiceRepo, timeoutContext)
 	invoiceCtrl := _invoiceController.NewInvoiceController(invoiceUsecase)
 
+	notificationRepo := _dbFactory.NewNotificationRepository(db)
+	notificationUsecase := _notificationUsecase.NewNotificationUsecase(notificationRepo, timeoutContext)
+	notificationCtrl := _notificationController.NewNotificationController(notificationUsecase)
+
 	reservationRepo := _dbFactory.NewReservationRepository(db)
-	reservationUsecase := _reservationUsecase.NewReservationUsecase(reservationRepo, invoiceRepo, adminRepo, hospitalRepo, bedtypeRepo, &configJWT, timeoutContext)
+	reservationUsecase := _reservationUsecase.NewReservationUsecase(reservationRepo, invoiceRepo, userRepo, hospitalRepo, bedtypeRepo, notificationRepo, timeoutContext)
 	reservationCtrl := _reservationController.NewReservationController(reservationUsecase)
 
 	paymentRepo := _dbFactory.NewPaymentRepository(db)
-	paymentUsecase := _paymentUsecase.NewPaymentUsecase(paymentRepo, reservationRepo, &configJWT, timeoutContext)
+	paymentUsecase := _paymentUsecase.NewPaymentUsecase(paymentRepo, reservationRepo, userRepo, notificationRepo, timeoutContext)
 	paymentCtrl := _paymentController.NewPaymentController(paymentUsecase)
 
 	routesInit := _routes.ControllerList{
-		JWTMiddleware:         configJWT.Init(),
-		AdminController:       *adminCtrl,
-		UserController:        *userCtrl,
-		RSBedCovidController:  *rsbedcovidCtrl,
-		ProvinceController:    *provinceCtrl,
-		RoleController:        *roleCtrl,
-		CityController:        *cityCtrl,
-		HospitalController:    *hospitalCtrl,
-		BedtypeController:     *bedtypeCtrl,
-		ReservationController: *reservationCtrl,
-		InvoiceController:     *invoiceCtrl,
-		PaymentController:     *paymentCtrl,
+		JWTMiddleware:          configJWT.Init(),
+		AdminController:        *adminCtrl,
+		UserController:         *userCtrl,
+		RSBedCovidController:   *rsbedcovidCtrl,
+		ProvinceController:     *provinceCtrl,
+		RoleController:         *roleCtrl,
+		CityController:         *cityCtrl,
+		HospitalController:     *hospitalCtrl,
+		BedtypeController:      *bedtypeCtrl,
+		ReservationController:  *reservationCtrl,
+		InvoiceController:      *invoiceCtrl,
+		PaymentController:      *paymentCtrl,
+		NotificationController: *notificationCtrl,
 	}
 	routesInit.RouteRegister(e)
 

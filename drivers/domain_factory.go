@@ -28,6 +28,9 @@ import (
 	paymentDomain "peduli-covid/businesses/payments"
 	paymentDB "peduli-covid/drivers/postgres/payments"
 
+	notificationDomain "peduli-covid/businesses/notifications"
+	notificationDB "peduli-covid/drivers/postgres/notifications"
+
 	"gorm.io/gorm"
 )
 
@@ -65,4 +68,8 @@ func NewInvoiceRepository(conn *gorm.DB) invoiceDomain.Repository {
 
 func NewPaymentRepository(conn *gorm.DB) paymentDomain.Repository {
 	return paymentDB.NewPostgresRepository(conn)
+}
+
+func NewNotificationRepository(conn *gorm.DB) notificationDomain.Repository {
+	return notificationDB.NewPostgresRepository(conn)
 }

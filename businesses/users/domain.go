@@ -27,6 +27,7 @@ type Usecase interface {
 }
 
 type Repository interface {
+	FindByHospitalID(ctx context.Context, hospitalID int) ([]Domain, error)
 	GetByID(ctx context.Context, id int) (Domain, error)
 	GetByEmail(ctx context.Context, email string) (Domain, error)
 	Store(ctx context.Context, data *Domain) error

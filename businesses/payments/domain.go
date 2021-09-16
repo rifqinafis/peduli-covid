@@ -19,7 +19,7 @@ type Domain struct {
 }
 
 type Usecase interface {
-	Store(ctx context.Context, data *Domain) error
+	Store(ctx context.Context, userID int, data *Domain) error
 	FindByUserID(ctx context.Context, userID int) ([]Domain, error)
 }
 

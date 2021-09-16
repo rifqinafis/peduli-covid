@@ -2,20 +2,17 @@ package invoices
 
 import (
 	"context"
-	"peduli-covid/app/middleware"
 	"time"
 )
 
 type invoiceUsecase struct {
 	invoiceRepository Repository
 	contextTimeout    time.Duration
-	jwtAuth           *middleware.ConfigJWT
 }
 
-func NewInvoiceUsecase(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewInvoiceUsecase(ur Repository, timeout time.Duration) Usecase {
 	return &invoiceUsecase{
 		invoiceRepository: ur,
-		jwtAuth:           jwtauth,
 		contextTimeout:    timeout,
 	}
 }

@@ -3,10 +3,10 @@ package reservations
 import (
 	"context"
 	"errors"
-	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/bedtypes"
 	"peduli-covid/businesses/hospitals"
 	"peduli-covid/businesses/invoices"
+	"peduli-covid/businesses/notifications"
 	"peduli-covid/businesses/users"
 	consts "peduli-covid/helpers/const"
 	"peduli-covid/helpers/str"
@@ -14,24 +14,24 @@ import (
 )
 
 type reservationUsecase struct {
-	reservationRepository Repository
-	invoiceRepository     invoices.Repository
-	adminRepository       users.Repository
-	hospitalRepository    hospitals.Repository
-	bedtypeRepository     bedtypes.Repository
-	contextTimeout        time.Duration
-	jwtAuth               *middleware.ConfigJWT
+	reservationRepository  Repository
+	invoiceRepository      invoices.Repository
+	userRepository         users.Repository
+	hospitalRepository     hospitals.Repository
+	bedtypeRepository      bedtypes.Repository
+	notificationRepository notifications.Repository
+	contextTimeout         time.Duration
 }
 
-func NewReservationUsecase(ur Repository, invoiceRepo invoices.Repository, adminRepo users.Repository, hospitalRepo hospitals.Repository, bedtypeRepo bedtypes.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewReservationUsecase(ur Repository, invoiceRepo invoices.Repository, userRepo users.Repository, hospitalRepo hospitals.Repository, bedtypeRepo bedtypes.Repository, notifRepo notifications.Repository, timeout time.Duration) Usecase {
 	return &reservationUsecase{
-		reservationRepository: ur,
-		invoiceRepository:     invoiceRepo,
-		adminRepository:       adminRepo,
-		hospitalRepository:    hospitalRepo,
-		bedtypeRepository:     bedtypeRepo,
-		jwtAuth:               jwtauth,
-		contextTimeout:        timeout,
+		reservationRepository:  ur,
+		invoiceRepository:      invoiceRepo,
+		userRepository:         userRepo,
+		hospitalRepository:     hospitalRepo,
+		bedtypeRepository:      bedtypeRepo,
+		notificationRepository: notifRepo,
+		contextTimeout:         timeout,
 	}
 }
 
@@ -47,11 +47,11 @@ func (uc *reservationUsecase) FindByUserID(ctx context.Context, userID int) ([]D
 	return res, nil
 }
 
-func (uc *reservationUsecase) FindByAdminID(ctx context.Context, adminID int) (res []Domain, err error) {
+func (uc *reservationUsecase) FindByAdminID(ctx context.Context, userID int) (res []Domain, err error) {
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
-	dataAdmin, err := uc.adminRepository.GetByID(ctx, adminID)
+	dataAdmin, err := uc.userRepository.GetByID(ctx, userID)
 	if err != nil {
 		return res, err
 	}
@@ -111,6 +111,21 @@ func (uc *reservationUsecase) UpdateStatusDone(ctx context.Context, reservationD
 		return err
 	}
 
+	dataUser, err := uc.userRepository.GetByID(ctx, dataReservation.UserID)
+	if err != nil {
+		return err
+	}
+
+	notifReq := notifications.Domain{
+		UserID:  dataUser.ID,
+		Code:    consts.NOTIF_VERIFIED,
+		Details: "admin telah memverifikasi reservasi anda dengan kamar " + dataBedtype.Name,
+	}
+	err = uc.notificationRepository.Store(ctx, &notifReq)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -154,6 +169,28 @@ func (uc *reservationUsecase) Store(ctx context.Context, reservationDomain *Doma
 	res, err = uc.invoiceRepository.Store(ctx, &req)
 	if err != nil {
 		return res, err
+	}
+
+	dataReserver, err := uc.userRepository.GetByID(ctx, reservationDomain.UserID)
+	if err != nil {
+		return res, err
+	}
+
+	dataUser, err := uc.userRepository.FindByHospitalID(ctx, reservationDomain.HospitalID)
+	if err != nil {
+		return res, err
+	}
+
+	for _, data := range dataUser {
+		notifReq := notifications.Domain{
+			UserID:  data.ID,
+			Code:    consts.NOTIF_RESERVATION,
+			Details: "user " + dataReserver.Email + " telah melakukan reservasi kamar " + dataBedtype.Name,
+		}
+		err = uc.notificationRepository.Store(ctx, &notifReq)
+		if err != nil {
+			return res, err
+		}
 	}
 
 	return res, err

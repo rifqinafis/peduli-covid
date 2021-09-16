@@ -2,7 +2,6 @@ package cities
 
 import (
 	"context"
-	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/rsbedcovid"
 	"peduli-covid/helpers/messages"
 	"strconv"
@@ -13,14 +12,12 @@ type cityUsecase struct {
 	cityRepository       Repository
 	rsbedcovidRepository rsbedcovid.Repository
 	contextTimeout       time.Duration
-	jwtAuth              *middleware.ConfigJWT
 }
 
-func NewCityUsecase(ur Repository, rsRepo rsbedcovid.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewCityUsecase(ur Repository, rsRepo rsbedcovid.Repository, timeout time.Duration) Usecase {
 	return &cityUsecase{
 		cityRepository:       ur,
 		rsbedcovidRepository: rsRepo,
-		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }

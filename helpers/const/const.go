@@ -10,4 +10,8 @@ const (
 	STATUS_DONE    = "done"
 	STATUS_PENDING = "pending"
 	STATUS_PAID    = "paid"
+
+	NOTIF_RESERVATION = "reservation"
+	NOTIF_PAYMENT     = "payment"
+	NOTIF_VERIFIED    = "verified"
 )

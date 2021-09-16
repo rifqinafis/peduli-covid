@@ -2,7 +2,6 @@ package bedtypes
 
 import (
 	"context"
-	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/hospitals"
 	"peduli-covid/businesses/rsbedcovid"
 	"peduli-covid/helpers/messages"
@@ -15,15 +14,13 @@ type bedtypeUsecase struct {
 	hospitalRepository   hospitals.Repository
 	rsbedcovidRepository rsbedcovid.Repository
 	contextTimeout       time.Duration
-	jwtAuth              *middleware.ConfigJWT
 }
 
-func NewBedtypeUsecase(ur Repository, cityRepo hospitals.Repository, rsRepo rsbedcovid.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewBedtypeUsecase(ur Repository, hospitalRepo hospitals.Repository, rsRepo rsbedcovid.Repository, timeout time.Duration) Usecase {
 	return &bedtypeUsecase{
 		bedtypeRepository:    ur,
-		hospitalRepository:   cityRepo,
+		hospitalRepository:   hospitalRepo,
 		rsbedcovidRepository: rsRepo,
-		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }

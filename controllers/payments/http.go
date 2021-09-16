@@ -27,8 +27,9 @@ func (ctrl *PaymentController) Store(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return controller.NewErrorResponse(c, http.StatusBadRequest, err)
 	}
+	userID := middleware.GetUser(c).ID
 
-	err := ctrl.paymentUsecase.Store(ctx, req.ToDomain())
+	err := ctrl.paymentUsecase.Store(ctx, userID, req.ToDomain())
 	if err != nil {
 		return controller.NewErrorResponse(c, http.StatusInternalServerError, err)
 	}

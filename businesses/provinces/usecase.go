@@ -2,7 +2,6 @@ package provinces
 
 import (
 	"context"
-	"peduli-covid/app/middleware"
 	"peduli-covid/businesses/rsbedcovid"
 	"peduli-covid/helpers/messages"
 	"time"
@@ -12,14 +11,12 @@ type provinceUsecase struct {
 	provinceRepository   Repository
 	rsbedcovidRepository rsbedcovid.Repository
 	contextTimeout       time.Duration
-	jwtAuth              *middleware.ConfigJWT
 }
 
-func NewProvinceUsecase(ur Repository, rsRepo rsbedcovid.Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewProvinceUsecase(ur Repository, rsRepo rsbedcovid.Repository, timeout time.Duration) Usecase {
 	return &provinceUsecase{
 		provinceRepository:   ur,
 		rsbedcovidRepository: rsRepo,
-		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }
