@@ -113,7 +113,7 @@ func main() {
 	adminCtrl := _adminController.NewAdminController(adminUsecase)
 
 	rsbedcovidRepo := _rsbedcovidRepo.NewRSBedCovid()
-	rsbedcovidUsecase := _rsbedcovidUsecase.NewRSBedCovid(rsbedcovidRepo, &configJWT, timeoutContext)
+	rsbedcovidUsecase := _rsbedcovidUsecase.NewRSBedCovid(rsbedcovidRepo, timeoutContext)
 	rsbedcovidCtrl := _rsbedcovidController.NewRSBedCovidController(rsbedcovidUsecase)
 
 	provinceRepo := _dbFactory.NewProvinceRepository(db)

@@ -2,20 +2,17 @@ package rsbedcovid
 
 import (
 	"context"
-	"peduli-covid/app/middleware"
 	"time"
 )
 
 type rsbedcovidUsecase struct {
 	rsbedcovidRepository Repository
 	contextTimeout       time.Duration
-	jwtAuth              *middleware.ConfigJWT
 }
 
-func NewRSBedCovid(ur Repository, jwtauth *middleware.ConfigJWT, timeout time.Duration) Usecase {
+func NewRSBedCovid(ur Repository, timeout time.Duration) Usecase {
 	return &rsbedcovidUsecase{
 		rsbedcovidRepository: ur,
-		jwtAuth:              jwtauth,
 		contextTimeout:       timeout,
 	}
 }
